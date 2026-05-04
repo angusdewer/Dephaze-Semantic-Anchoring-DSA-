@@ -3,7 +3,6 @@
 **A Φ³ Geometric Framework for Eliminating AI Hallucination**
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20020443.svg)](https://doi.org/10.5281/zenodo.20020443)
-[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ---
 
@@ -58,7 +57,7 @@ dephaze-dsa/
 ├── README.md
 ├── paper/
 │   ├── dephaze_DSA_v18_FINAL.pdf      # Full paper
-│   └── dephaze_DSA_v18_FINAL.tex      # LaTeX source
+│  
 ├── code/
 │   ├── dsa_simulation.py              # DSR numerical simulation
 │   ├── dsa_hidden_state_test.py       # Hidden state norm extraction
