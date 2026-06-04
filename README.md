@@ -86,6 +86,12 @@ Direct SVD of Mistral-7B weight matrices W₁ ∈ ℝ¹⁴³³⁶ˣ⁴⁰⁹⁶,
 
 **Fossil hallucination** — delta direction reversed. The fossil is the φ³ attractor's own geometry *reflected* against the factual state through r\*. Cross-correlation at layer 20: r = 0.936. This explains why fossil hallucinations are syntactically fluent and internally consistent — they are generated from the same geometric structure, merely from the reflected locus.
 
+> **NOTE ON THE ATTRACTOR METRIC:** Φ³_ext measures correlation geometry, not amplitude.
+> "Close to the attractor" means the k₄ imprint-scale Fibonacci inter-dimensional
+> correlation is preserved — not that ‖h‖ ≈ r\*. Layer normalisation rescales amplitudes
+> but preserves correlation structure. The DSA correction acts in amplitude space;
+> the Φ³_ext measurement acts in correlation space. Both follow from ff/d = φ³ − φ⁻³ = 4.
+
 All reproducible on **free Google Colab T4 GPU**. Public models. Public datasets. Zero extra parameters.
 
 ---
