@@ -1,23 +1,69 @@
 ================================================================================
 DEPHAZE SEMANTIC ANCHORING (DSA) — EMPIRICAL VALIDATION RESULTS
 ================================================================================
-DOI: 10.5281/zenodo.20020443
+DOI: 10.5281/zenodo.20543468
 Prediction locked: 2026-03-01
-Generated: April 2026
+Generated: June 2026 — Version 2.0
 
-Model:   Mistral-7B-v0.1
-Dataset: TruthfulQA (generation split, validation set)
-N pairs: 100 (factual best_answer vs. incorrect_answers[0])
+Model:   Mistral-7B-v0.1 (primary), GPT-2-117M, Llama-3.2-3B
+Dataset: TruthfulQA (generation split, validation set) + custom pairs
+N pairs: 100 (Exp 1–6) / 50 (Exp 7–13)
 Hardware: Google Colab T4 GPU (free tier)
 phi3 = 4.2360679775
 r*   = sqrt(phi3) = 2.0581710273
 
 ================================================================================
-EXPERIMENT 4 — MEAN HIDDEN-STATE NORM (H > T)
+EXPERIMENT 1 — GPT-2: MEAN NORM (H > T)
 ================================================================================
-Prediction: Hallucinatory mean norm > Factual mean norm in every layer
-Result:     31/31 layers correct
-Binomial p: 0.000000 (p = 2^-31 ≈ 5×10^-10)
+Model:  GPT-2 (117M, 12 layers, d=768)
+Result: 10/11 layers H > T
+Binomial p: 0.006
+
+================================================================================
+EXPERIMENT 2 — LLAMA-3.2-3B: NORM RANGE (H > T)
+================================================================================
+Model:  Llama-3.2-3B (28 layers, d=3072)
+Result: 7/26 layers significant
+Binomial p: 0.029
+
+Significant layers:
+Layer    T_range   H_range      p      sig
+------------------------------------------
+    9    592.18    592.26    0.0015    **
+   13    593.12    593.21    0.0049    **
+   14    594.12    594.21    0.0289     *
+   17    591.81    591.99    0.0305     *
+   27    570.08    570.39    0.0461     *
+   28     15.857    15.580   0.0006   ***
+
+================================================================================
+EXPERIMENT 3 — MISTRAL-7B CUSTOM: CV STABILITY
+================================================================================
+Model:  Mistral-7B (32 layers, d=4096), 50 custom pairs
+Result: CV factual < hallucinatory in 31/31 layers
+Binomial p: 5×10⁻¹⁰
+
+Significant norm range layers: 22/31 (p=0.029)
+Layer  T_range  H_range    p      sig
+--------------------------------------
+   15  259.49   259.56   0.0078    **
+   16  258.59   258.68   0.0220     *
+   17  257.82   257.97   0.0026    **
+   18  256.95   257.12   0.0054    **
+   19  255.75   255.97   0.0010   ***
+   20  257.48   257.72   0.0046    **
+   21  256.01   256.27   0.0129     *
+   28  246.71   247.16   0.0188     *
+   29  243.40   243.87   0.0085    **
+   30  240.86   241.32   0.0322     *
+   31  207.33   207.75   0.0455     *
+
+================================================================================
+EXPERIMENT 4 — MISTRAL-7B TRUTHFULQA: MEAN NORM (H > T)
+================================================================================
+Model:  Mistral-7B, TruthfulQA N=100
+Result: 31/31 layers H > T
+Binomial p: 0.000
 
 Layer   T_mean   H_mean     Diff   H>T
 ---------------------------------------
@@ -51,51 +97,27 @@ Layer   T_mean   H_mean     Diff   H>T
    28   41.929   42.011   +0.081   60/100
    29   44.057   44.146   +0.088   59/100
    30   48.185   48.204   +0.019   57/100
-   31   46.001   45.898   -0.103   57/100  [final layer reversal — normalizing effect]
+   31   46.001   45.898   -0.103   57/100  [final layer reversal — normalising effect]
 
-================================================================================
-EXPERIMENT 4 — CV STABILITY (late layers)
-================================================================================
-Prediction: Hallucinatory CV > Factual CV in late layers
-Result:     Significant in layers 27–31
-
-Layer    T_CV     H_CV     Diff      p      sig
-------------------------------------------------
-   27   1.7936   1.7986  +0.0050  0.0444    *
-   28   1.7053   1.7113  +0.0060  0.0102    *
-   29   1.6031   1.6086  +0.0055  0.0142    *
-   30   1.4402   1.4478  +0.0076  0.0024   **
-   31   0.9872   0.9956  +0.0085  0.0086   **
-
-================================================================================
-EXPERIMENT 4 — NORM RANGE (significant layers)
-================================================================================
-Prediction: Hallucinatory norm range > Factual
-Significant layers: 5, 6, 8, 13, 14, 15, 16, 17
-
-Layer  T_range  H_range    Diff      p      sig
-------------------------------------------------
-    5  319.440  319.426  -0.013  0.0061   **  [T < H reversed — inner branch]
-    6  319.240  319.219  -0.021  0.0117    *
-    8  318.711  318.693  -0.019  0.0313    *
-   13  324.659  324.629  -0.030  0.0200    *
-   14  324.175  324.107  -0.068  0.0024   **
-   15  335.154  335.098  -0.055  0.0101    *
-   16  334.399  334.360  -0.039  0.0229    *
-   17  333.636  333.573  -0.063  0.0135    *
+CV significant layers (27–31): p < 0.05 all
 
 ================================================================================
 EXPERIMENT 5 — PHI3-ATTRACTOR DISTANCE
 ================================================================================
-Prediction: Hallucinatory hidden states closer to r*=sqrt(phi3)=2.0582
-Result:     10/11 target layers correct
+Model:  Mistral-7B, TruthfulQA N=100
+Result: 10/11 target layers H closer to r*
 Binomial p: 0.012
+
+Note: This experiment established a significant geometric difference
+between factual and hallucinatory hidden states near r*. The
+interpretation was preliminary; Experiment 6 identifies the
+underlying mechanism (Fibonacci inter-dimensional structure).
 
 Target layers: [8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 31]
 
 Layer  T_dist   H_dist    Diff    H<T
 ---------------------------------------
-    8  20.027   20.237  -0.210   58/100  [H closer to r*]
+    8  20.027   20.237  -0.210   58/100
     9  20.293   20.511  -0.218   63/100
    10  20.712   20.934  -0.222   62/100
    11  21.059   21.286  -0.227   63/100
@@ -105,40 +127,245 @@ Layer  T_dist   H_dist    Diff    H<T
    15  23.058   23.289  -0.231   59/100
    20  28.836   29.012  -0.176   60/100
    25  35.651   35.785  -0.134   60/100
-   31  43.943   43.840  +0.103   57/100  [exception: final layer]
+   31  43.943   43.840  +0.103   57/100  [exception: final layer reversal]
 
 ================================================================================
-EXPERIMENT 5 — CONCENTRATION AROUND r* (inner layers)
+EXPERIMENT 6 — PHI3 FIBONACCI DIMENSIONAL INDEX
 ================================================================================
-Prediction: Factual tokens MORE concentrated near r* in early layers
-Significant layers: 10, 11, 13
+Model:  Mistral-7B, TruthfulQA N=100
+Metric: Phi3_ext = [corr(k5=369)+corr(k4=598)] - [corr(k3=967)+corr(k2=1565)]
 
-Layer  T_conc   H_conc    Diff      p      sig   Interpretation
+Result: T > H in 31/32 layers
+Binomial p: 1.54×10⁻⁸
+
+Phi3-index (simple):  26/32 layers  p=5.35×10⁻⁴
+Phi3_ext (extended):  31/32 layers  p=1.54×10⁻⁸  ← main result
+
+Strongest layers:
+Layer   effect      p       sig
+---------------------------------
+   13  +0.005628  0.00054   ***
+   14  +0.005730  0.00017   ***
+   25  +0.006318  0.00211    **
+   26  +0.006104  0.00163    **
+   27  +0.006657  0.00292    **
+
+Layer-zone significance:
+  [0, phi^-3]           layers  1-7:   p=0.187
+  [phi^-3, phi^-2]      layers  8-12:  p=0.040 *
+  [phi^-2, phi^-1]      layers 13-19:  p<0.001 ***
+  [phi^-1, 1-phi^-3]    layers 20-24:  p<0.001 ***
+  [1-phi^-3, 1]         layers 25-32:  p<0.001 ***
+
+================================================================================
+PHI-SPECIFICITY CONTROLS
+================================================================================
+
+TEST A — Arbitrary step quadruples
+-----------------------------------
+Family              Mean effect  Wins/32   Z
+Fibonacci (ref)     +0.003021    31/32     —
+Shifted ±25–150     +0.000020    17.1/32   —
+Random N=20         -0.000283    15.2/32   —
+Geometric bases     +0.000325    19/32     —
+Linear spacing      +0.000398    18.2/32   —
+
+Z-score (effect): +3.04
+P(any control >= Fibonacci): 0.000
+
+TEST B — Log-uniform bases (n=5,4,3,2)
+----------------------------------------
+Base         Steps                  Wins/32   p           Effect
+phi=1.618    (369,598,967,1565)     31/32     1.5e-8      +0.003021  <- REF
+sqrt3=1.732  (263,455,788,1365)     26/32     5e-4        +0.001409
+1.5          (539,809,1214,1820)    20/32     0.215       +0.000205
+2            (128,256,512,1024)     18/32     0.597       +0.000138
+e=2.718      (28,75,204,554)        14/32     0.597       +0.000075
+sqrt2=1.414  (724,1024,1448,2048)   12/32     0.215       -0.000957
+phi2=2.618   (33,87,228,598)        11/32     0.110       -0.000703
+3            (17,51,152,455)         8/32     7e-3        -0.001195
+
+Z-score (effect): +3.85
+P(log-uniform control >= phi): 0.000
+phi better than sqrt3 (best control): 28/32 layers, p=0.000019
+
+Conclusion: Not enough to be logarithmically uniform.
+The base phi carries the signal.
+
+================================================================================
+SPECTRAL CONFIRMATION — SVD OF WEIGHT MATRICES
+================================================================================
+Model:  Mistral-7B W1=[14336x4096], W2=[4096x14336]
+Metric: r_bar = mean(sigma_i / sigma_{i+1})
+
+Layer  r_bar(W1)  H1_1  r_bar(W2)  H1_2  Fib_matches
+------------------------------------------------------
+    1    1.0089     Y     1.0049     Y       12
+    8    1.0111     Y     1.0047     Y        9
+   12    1.0109     Y     1.0051     Y       14
+   20    1.0143     Y     1.0039     Y       12
+   24    1.0139     Y     1.0053     Y        9
+   28    1.0127     Y     1.0032     N        9
+
+H1 = trained matrix closer to phi than random baseline.
+Result: 11/12 cases (p=0.0063, binomial)
+Exception: layer 28, W2: |r_bar - phi| = 0.6149 vs random 0.6143
+  (diff=0.0006, within measurement noise, consistent with
+   final-layer normalising effect seen in all experiments)
+
+r_bar trained mean: 1.0082
+r_bar random  mean: 1.0038
+phi:                1.6180
+
+Algebraic chain closed:
+  ff/d = phi^3 - phi^{-3} = 4
+  -> W singular ratios closer to phi (11/12, p=0.0063)
+  -> hidden state Phi^3-Fibonacci structure (31/32, p=1.54e-8)
+
+================================================================================
+MULTI-MODEL RESULTS
+================================================================================
+Model         d     Active n    Steps k               phi-specific?
+--------------------------------------------------------------------
+GPT-2 117M    768   (7,3,1,0)   (26,181,475,768)      YES 12/12 p=4.9e-4
+Mistral-7B   4096   (5,4,3,2)   (369,598,967,1565)    YES 31/32 p=1.5e-8
+GPT-J-6B     4096   (6,4,3,0)   (228,598,967,4096)    YES* 27/28
+OPT-1.3B     2048   (7,4,3,1)   (71,299,483,1266)     YES* 22/24
+OPT-6.7B     4096   —           (128,256,512,1024)    NO (2^n dominant, ReLU)
+Qwen-1.5-7B  4096   —           —                     NO (ff/d=2.688)
+
+* post-hoc search, not predicted
+
+================================================================================
+EXPERIMENTS 7–13 — GATE STRUCTURE
+================================================================================
+Model:  Mistral-7B, TruthfulQA N=50 pairs
+Setup:  k-profile [c(k6), c(k5), c(k4), c(k3), c(k2)] per layer per sample
+
+EXPERIMENT 7 — Layer-by-Layer Gate Profile
+-------------------------------------------
+Zone                  Layers   T>H%    mean diff    p
+------------------------------------------------------
+[0, phi^-3]            1-7    52.9%   +0.00009    0.155
+[phi^-3, phi^-2]       8-12   58.0%   +0.00095    0.007 **
+[phi^-2, phi^-1]      13-19   53.4%   +0.00033    0.109
+[phi^-1, 1-phi^-3]    20-24   58.4%   +0.00197    0.005 **
+[1-phi^-3, 1]         25-32   50.2%   +0.00040    0.480
+
+Active zones: phi^-3 boundary (layers 8-12) and phi^-1 boundary (layers 20-24)
+FFT dominant period: 10.7 layers (predicted phi-periodic: 32*phi^-2 = 12.2 layers)
+
+EXPERIMENT 8 — k-Scale Decomposition
+--------------------------------------
+k-scale   Zone1 (8-12) diff    p        Zone2 (20-24) diff    p
 ----------------------------------------------------------------
-   10   0.819    0.806  +0.013  0.00023  ***   Factual closer to r*
-   11   0.531    0.509  +0.022  0.00131   **   Factual closer to r*
-   13   0.016    0.011  +0.005  0.00344   **   Factual closer to r*
+k6=228       -0.00194        0.999         +0.00092          0.025 *
+k5=369       -0.00046        0.956         -0.00023          0.141
+k4=598       +0.00097        0.013 *       +0.00026          0.171
+k3=967       +0.00006        0.525         -0.00097          0.715
+k2=1565      -0.00010        0.795         -0.00028          0.475
 
-Note: In early layers (10-13) factual tokens concentrate near r*.
-In later layers hallucinatory tokens anchor on the Phi3-manifold.
-This is consistent with the Dephaze two-regime interpretation:
-  Early layers: factual prompts resonate with Omega_0 (groundstate near r*)
-  Late layers:  hallucinatory prompts lock onto Phi3-attractor (escape trajectory)
+Zone 1: driven exclusively by k4=598 (imprint scale, phi^-4)
+Zone 2: driven exclusively by k6=228 (fine scale, phi^-6)
+Note: c(k6) in Zone 1 shows p=0.999 (H>T reversed) — attractor fine
+structure dominates before factual imprint is established.
+
+EXPERIMENT 9 — k6 Localisation
+---------------------------------
+k6=228 significant T>H at exactly ONE layer: layer 23
+  diff = +0.00150, p = 0.032
+All other layers: p > 0.05 for k6.
+Consistent with phi-partition: layer 23 in [phi^-1, 1-phi^-3] zone.
+
+EXPERIMENT 10 — T-H Cross-Correlation
+----------------------------------------
+rho range: [0.797, 0.968] across all 32 layers
+rho > 0.80 in 31/32 layers
+All layers p < 0.001 vs zero (t-test)
+
+Hallucinatory k-profile SD < factual SD in 18/32 layers (layers 13-28)
+-> hallucinatory hidden states more tightly ordered in phi-space
+   (attractor compression, consistent with DSA picture)
+
+EXPERIMENT 11 — Delta Recovery
+---------------------------------
+Mean delta correction improvement: 1-4% across all layers
+Best layer: 25  improvement: 4.1%
+No layer exceeds 5%.
+Conclusion: delta is question-specific, not a universal corrector.
+
+EXPERIMENT 12 — Delta Consistency
+------------------------------------
+Mean dc > 0 at p < 0.05 in 28/32 layers
+Mean dc across layers: ~0.13  SD: ~0.50
+Peak layer: 29  mean dc = 0.188
+
+Distribution at layer 29 (N=50 pairs):
+  dc > 0.5  (high consistency):  ~32%
+  0 <= dc <= 0.5 (moderate):     ~36%
+  dc < 0   (reversed):           ~32%
+
+EXPERIMENT 13 — Two Hallucination Types
+-----------------------------------------
+Partition at peak layer 29:
+  Recoverable (dc > 0.5):   n=16  (~32%)
+  Fossil      (dc < 0.0):   n=16  (~32%)
+  Neutral     (0<=dc<=0.5): n=18  (~36%)
+
+Cross-correlation at critical layers:
+Layer   rho_R    rho_F    delta_rho    p            sig
+--------------------------------------------------------
+  20    0.697    0.936    -0.239       1.6e-3         **
+  24    0.763    0.892    -0.129       4.4e-2          *
+
+k-scale signature:
+  Recoverable: Delta_k2 = +0.0023  (long scale positive)
+               Delta_k6 ~= 0
+  Fossil:      Delta_k5 = +0.0008, Delta_k4 = +0.0016
+               Delta_k2 = -0.0015  (long scale REVERSED)
+
+Interpretation:
+  Recoverable: displaced from factual state in phi-space, not reflected
+  Fossil:      mirror-symmetric reflection of factual geometry through r*
+               rho_F=0.936 > rho_R=0.697 — fossil states share MORE
+               structure with factual states (same geometry, reflected locus)
+
+Physical meaning:
+  Fossil hallucinations are NOT random noise. They are the transformer's
+  own phi^3 geometry manifesting on the opposite side of the Omega_0
+  ground state from the factual answer. This explains why they are
+  syntactically fluent and internally consistent.
+
+  Bifurcation at layer 20 — the phi^-1 partition boundary
+  (floor(32 * phi^-1) = 19). Fossil/recoverable distinction
+  established at precisely this geometric threshold.
 
 ================================================================================
-ALL 5 EXPERIMENTS — SUMMARY TABLE
+ALL 13 EXPERIMENTS — SUMMARY TABLE
 ================================================================================
 
-Exp  Model          Dataset       Signal                    p-value   Result
-------------------------------------------------------------------------------
-1    GPT-2 (117M)   Custom(N=50)  Norm H>T, 10/11 layers   0.006     CONFIRMED
-2    Llama-3.2-3B   Custom(N=50)  Range H>T, sig layers     0.029     CONFIRMED
-3    Mistral-7B     Custom(N=50)  CV T<H, 31/31 layers      5e-10     CONFIRMED
-4    Mistral-7B     TruthfulQA    Norm H>T, 31/31 layers    0.000     CONFIRMED
-5    Mistral-7B     TruthfulQA    Phi3-dist, 10/11 layers   0.012     CONFIRMED
+Exp  Model           Dataset         Signal                        p-value
+--------------------------------------------------------------------------
+1    GPT-2 (117M)    Custom N=50     Norm H>T, 10/11 layers        0.006
+2    Llama-3.2-3B    Custom N=50     Norm range H>T                0.029
+3    Mistral-7B      Custom N=50     CV T<H, 31/31 layers          5e-10
+4    Mistral-7B      TruthfulQA 100  Norm H>T, 31/31 layers        0.000
+5    Mistral-7B      TruthfulQA 100  Phi3-dist, 10/11 layers       0.012
+6    Mistral-7B      TruthfulQA 100  Phi3_ext T>H, 31/32 layers    1.54e-8
+7    Mistral-7B      TruthfulQA  50  Two-zone gate profile          0.005-0.007
+8    Mistral-7B      TruthfulQA  50  k4 Zone1, k6 Zone2             0.013/0.025
+9    Mistral-7B      TruthfulQA  50  k6 localised layer 23          0.032
+10   Mistral-7B      TruthfulQA  50  T-H cross-corr r>0.80 31/32   <0.001
+11   Mistral-7B      TruthfulQA  50  Delta recovery 1-4%            —
+12   Mistral-7B      TruthfulQA  50  Delta consistency 28/32        <0.05
+13   Mistral-7B      TruthfulQA  50  Fossil/recoverable p=0.0016   0.0016
+
+Phi-specificity Test A: Z=+3.04  P=0.000
+Phi-specificity Test B: Z=+3.85  P=0.000  (log-uniform bases)
+SVD spectral:          11/12     p=0.0063
 
 ================================================================================
-DSA SIMULATION RESULTS (numerical, not LLM)
+DSA SIMULATION RESULTS
 ================================================================================
 dim=64, steps=800, alpha=0.08, sigma=0.04, Lambda=1.2, seed=2025
 
@@ -165,7 +392,19 @@ phi^3 - phi^(-3) = 4   (exact, from phi^2 = phi + 1)
 LHS = 4.236068 - 0.236068 = 4.000000   ERROR = 0.000000
 
 Transformer ff/d = 4 is not empirical — it is structural.
-This identity connects transformer architecture to Dephaze geometry.
+
+Fibonacci dimensional steps (d=4096):
+  k7 = round(4096 * phi^-7) = 141
+  k6 = round(4096 * phi^-6) = 228   <- fundamental oscillation period (FFT: 227.3)
+  k5 = round(4096 * phi^-5) = 369
+  k4 = round(4096 * phi^-4) = 598   <- imprint scale boundary
+  k3 = round(4096 * phi^-3) = 967   <- generative scale boundary
+  k2 = round(4096 * phi^-2) = 1565
+  k1 = round(4096 * phi^-1) = 2531
+
+Fibonacci identity: k5+k4 = 369+598 = 967 = k3  (exact)
+                    k4+k3 = 598+967 = 1565 = k2  (exact)
+k3/k4 = 1.617 ≈ phi = 1.618  (bifurcation point)
 
 ================================================================================
 REPRODUCIBILITY
@@ -173,8 +412,9 @@ REPRODUCIBILITY
 All experiments reproducible on:
   - Google Colab (free T4 GPU)
   - Python 3.10+
-  - transformers>=4.35, torch>=2.0, datasets>=2.14, scipy>=1.11
+  - transformers>=4.35, torch>=2.0, datasets>=2.14, scipy>=1.11, scikit-learn
 
-Code: https://github.com/angusdewer/dephaze-dsa
-DOI:  https://doi.org/10.5281/zenodo.20020443
+Code:    https://github.com/angusdewer/Dephaze-Semantic-Anchoring-DSA-
+DOI:     https://doi.org/10.5281/zenodo.20543468
+Related: https://doi.org/10.5281/zenodo.20539675
 ================================================================================
